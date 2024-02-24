@@ -1,19 +1,17 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"strconv"
+	"github.com/profitCalculator/fileOps"
 )
 
 func main() {
 
 	var userChoice int
-	var accountBalance, err  = readBalanceFromFile()
+	var accountBalance, err  = fileops.ReadFromFile("balance.txt")
 
 	if(err != nil){
-		panic("server error, contact admin")
+		fmt.Println(err)
 	}
 
 	for {
@@ -42,7 +40,7 @@ func main() {
 
 			accountBalance -= customerWithrawalAmount
 
-			writeBalanceToFile(accountBalance)
+			fileops.WriteBalanceToFile(accountBalance, "balance.txt")
 			fmt.Printf("You have withdrawn %v amount, Your total account balance is %v ", customerWithrawalAmount, accountBalance)
 
 		} else if userChoice == 3 {
@@ -52,7 +50,7 @@ func main() {
 
 			accountBalance += customerDeposit
 
-			writeBalanceToFile(accountBalance)
+			fileops.WriteBalanceToFile(accountBalance, "balance.txt")
 			fmt.Printf("You have deposited %v, Your current balance is %v", customerDeposit, accountBalance)
 		} else {
 			break
@@ -62,30 +60,4 @@ func main() {
 
 	fmt.Println("Thank you for banking with us")
 }
-
-func writeBalanceToFile(balance float64) {
-
-	balanceText := fmt.Sprint(balance)
-
-	os.WriteFile("balance.txt", []byte(balanceText), 0644)
-}
-
-func readBalanceFromFile() (float64, error) {
-
-	data, err := os.ReadFile("balance.txt")
-
-
-	if(err != nil){
-		return 1000,  errors.New("no such file")
-	}
-
-	balanceText := string(data)
-	balance, err := strconv.ParseFloat(balanceText, 64)
-
-	if(err != nil){
-		return 1000, errors.New("no such file")
-	}
-	return balance, nil
-}
-
 
